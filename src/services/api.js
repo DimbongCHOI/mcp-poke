@@ -37,11 +37,11 @@ pokeAPI.interceptors.response.use(
 )
 
 // Korean Pokemon name mapping
-import { KOREAN_POKEMON_NAMES } from '../pokemon-mappings.js'
+import { KOREAN_TO_ENGLISH } from '../pokemon-mappings.js'
 
 // Helper function to convert Korean name to English
 const convertKoreanToEnglish = (name) => {
-  return KOREAN_POKEMON_NAMES[name.toLowerCase()] || name.toLowerCase()
+  return KOREAN_TO_ENGLISH[name.toLowerCase()] || name.toLowerCase()
 }
 
 export const pokemonAPI = {
@@ -65,8 +65,8 @@ export const pokemonAPI = {
       
       // Add Korean name to response
       const pokemonData = response.data
-      const koreanName = Object.keys(KOREAN_POKEMON_NAMES).find(
-        key => KOREAN_POKEMON_NAMES[key] === pokemonData.name
+      const koreanName = Object.keys(KOREAN_TO_ENGLISH).find(
+        key => KOREAN_TO_ENGLISH[key] === pokemonData.name
       )
       
       return {
