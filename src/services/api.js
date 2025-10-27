@@ -1,10 +1,11 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:3001/api'
+// Direct Pokemon API calls (no backend server needed)
+const POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2'
 
-// Create axios instance
-const api = axios.create({
-  baseURL: API_BASE_URL,
+// Create axios instance for Pokemon API
+const pokeAPI = axios.create({
+  baseURL: POKEAPI_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -12,34 +13,42 @@ const api = axios.create({
 })
 
 // Request interceptor
-api.interceptors.request.use(
+pokeAPI.interceptors.request.use(
   (config) => {
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`)
+    console.log(`Pokemon API Request: ${config.method?.toUpperCase()} ${config.url}`)
     return config
   },
   (error) => {
-    console.error('API Request Error:', error)
+    console.error('Pokemon API Request Error:', error)
     return Promise.reject(error)
   }
 )
 
 // Response interceptor
-api.interceptors.response.use(
+pokeAPI.interceptors.response.use(
   (response) => {
-    console.log(`API Response: ${response.status} ${response.config.url}`)
+    console.log(`Pokemon API Response: ${response.status} ${response.config.url}`)
     return response
   },
   (error) => {
-    console.error('API Response Error:', error.response?.data || error.message)
+    console.error('Pokemon API Response Error:', error.response?.data || error.message)
     return Promise.reject(error)
   }
 )
+
+// Korean Pokemon name mapping
+import { KOREAN_POKEMON_NAMES } from '../pokemon-mappings.js'
+
+// Helper function to convert Korean name to English
+const convertKoreanToEnglish = (name) => {
+  return KOREAN_POKEMON_NAMES[name.toLowerCase()] || name.toLowerCase()
+}
 
 export const pokemonAPI = {
   // Get Pokemon list with pagination
   getPokemonList: async (offset = 0, limit = 20) => {
     try {
-      const response = await api.get(`/pokemon?offset=${offset}&limit=${limit}`)
+      const response = await pokeAPI.get(`/pokemon?offset=${offset}&limit=${limit}`)
       return response.data
     } catch (error) {
       console.error('Pokemon list error:', error.response?.data || error.message)
@@ -50,8 +59,20 @@ export const pokemonAPI = {
   // Get Pokemon by ID or name
   getPokemon: async (identifier) => {
     try {
-      const response = await api.get(`/pokemon/${identifier}`)
-      return response.data
+      // Convert Korean name to English if needed
+      const englishName = convertKoreanToEnglish(identifier)
+      const response = await pokeAPI.get(`/pokemon/${englishName}`)
+      
+      // Add Korean name to response
+      const pokemonData = response.data
+      const koreanName = Object.keys(KOREAN_POKEMON_NAMES).find(
+        key => KOREAN_POKEMON_NAMES[key] === pokemonData.name
+      )
+      
+      return {
+        ...pokemonData,
+        korean_name: koreanName || pokemonData.name
+      }
     } catch (error) {
       throw new Error(`포켓몬 "${identifier}"을 찾을 수 없습니다.`)
     }
@@ -60,7 +81,7 @@ export const pokemonAPI = {
   // Get Pokemon by type
   getPokemonByType: async (type) => {
     try {
-      const response = await api.get(`/type/${type}`)
+      const response = await pokeAPI.get(`/type/${type}`)
       return response.data
     } catch (error) {
       throw new Error(`타입 "${type}"의 포켓몬을 찾을 수 없습니다.`)
@@ -70,7 +91,7 @@ export const pokemonAPI = {
   // Get all Pokemon types
   getPokemonTypes: async () => {
     try {
-      const response = await api.get('/types')
+      const response = await pokeAPI.get('/type')
       return response.data
     } catch (error) {
       console.error('Pokemon types error:', error.response?.data || error.message)
@@ -78,58 +99,78 @@ export const pokemonAPI = {
     }
   },
 
-  // Search Pokemon
+  // Search Pokemon (simplified - just get Pokemon by name)
   searchPokemon: async (query) => {
     try {
-      const response = await api.get(`/search?q=${encodeURIComponent(query)}`)
-      return response.data
+      const englishName = convertKoreanToEnglish(query)
+      const response = await pokeAPI.get(`/pokemon/${englishName}`)
+      
+      return {
+        results: [response.data],
+        count: 1
+      }
     } catch (error) {
       console.error('Pokemon search error:', error.response?.data || error.message)
       throw new Error(`포켓몬 검색에 실패했습니다: ${error.response?.data?.error || error.message}`)
     }
   },
 
-  // Get Pokemon stats
+  // Get Pokemon stats (same as getPokemon)
   getPokemonStats: async (identifier) => {
     try {
-      const response = await api.get(`/pokemon/${identifier}/stats`)
-      return response.data
+      const englishName = convertKoreanToEnglish(identifier)
+      const response = await pokeAPI.get(`/pokemon/${englishName}`)
+      
+      return {
+        stats: response.data.stats,
+        name: response.data.name,
+        id: response.data.id
+      }
     } catch (error) {
       throw new Error(`포켓몬 "${identifier}"의 능력치를 가져오는데 실패했습니다.`)
     }
   },
 }
 
+// Simple chat simulation (no AI backend)
 export const chatAPI = {
-  // Send message to AI assistant
   sendMessage: async (message) => {
     try {
-      const response = await api.post('/chat', { message })
-      return response.data
+      // Simple keyword-based responses
+      const lowerMessage = message.toLowerCase()
+      
+      if (lowerMessage.includes('피카츄')) {
+        const pokemon = await pokemonAPI.getPokemon('피카츄')
+        return {
+          response: `피카츄 정보: ${pokemon.korean_name || pokemon.name} (ID: ${pokemon.id})`,
+          pokemon: pokemon
+        }
+      }
+      
+      if (lowerMessage.includes('리자몽')) {
+        const pokemon = await pokemonAPI.getPokemon('리자몽')
+        return {
+          response: `리자몽 정보: ${pokemon.korean_name || pokemon.name} (ID: ${pokemon.id})`,
+          pokemon: pokemon
+        }
+      }
+      
+      return {
+        response: `"${message}"에 대한 응답입니다. 포켓몬 이름을 말씀해주시면 정보를 제공해드릴게요!`,
+        pokemon: null
+      }
     } catch (error) {
       throw new Error('AI 어시스턴트와의 통신에 실패했습니다.')
     }
   },
 
-  // Get chat history
   getChatHistory: async () => {
-    try {
-      const response = await api.get('/chat/history')
-      return response.data
-    } catch (error) {
-      throw new Error('채팅 기록을 가져오는데 실패했습니다.')
-    }
+    return { messages: [] }
   },
 
-  // Clear chat history
   clearChatHistory: async () => {
-    try {
-      const response = await api.delete('/chat/history')
-      return response.data
-    } catch (error) {
-      throw new Error('채팅 기록을 삭제하는데 실패했습니다.')
-    }
+    return { success: true }
   },
 }
 
-export default api
+export default pokeAPI
