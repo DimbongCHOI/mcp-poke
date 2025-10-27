@@ -44,6 +44,21 @@ const convertKoreanToEnglish = (name) => {
   return KOREAN_TO_ENGLISH[name.toLowerCase()] || name.toLowerCase()
 }
 
+// Test function to check if API is working
+export const testAPI = {
+  testConnection: async () => {
+    try {
+      console.log('Testing Pokemon API connection...')
+      const response = await pokeAPI.get('/pokemon/1')
+      console.log('API test successful:', response.data.name)
+      return { success: true, pokemon: response.data }
+    } catch (error) {
+      console.error('API test failed:', error.message)
+      return { success: false, error: error.message }
+    }
+  }
+}
+
 export const pokemonAPI = {
   // Get Pokemon list with pagination
   getPokemonList: async (offset = 0, limit = 20) => {
@@ -59,23 +74,34 @@ export const pokemonAPI = {
   // Get Pokemon by ID or name
   getPokemon: async (identifier) => {
     try {
+      console.log(`Searching for Pokemon: ${identifier}`)
+      
       // Try direct identifier first (for IDs)
       if (!isNaN(identifier)) {
+        console.log(`Trying numeric ID: ${identifier}`)
         const response = await pokeAPI.get(`/pokemon/${identifier}`)
+        console.log(`Found Pokemon by ID:`, response.data.name)
         return response.data
       }
       
       // Try Korean name conversion
       const englishName = convertKoreanToEnglish(identifier)
+      console.log(`Trying Korean conversion: ${identifier} -> ${englishName}`)
       const response = await pokeAPI.get(`/pokemon/${englishName}`)
-      
+      console.log(`Found Pokemon by Korean name:`, response.data.name)
       return response.data
+      
     } catch (error) {
+      console.error(`Korean conversion failed for ${identifier}:`, error.message)
+      
       // If Korean conversion fails, try original identifier
       try {
+        console.log(`Trying original identifier: ${identifier}`)
         const response = await pokeAPI.get(`/pokemon/${identifier}`)
+        console.log(`Found Pokemon by original name:`, response.data.name)
         return response.data
       } catch (secondError) {
+        console.error(`All attempts failed for ${identifier}:`, secondError.message)
         throw new Error(`포켓몬 "${identifier}"을 찾을 수 없습니다.`)
       }
     }

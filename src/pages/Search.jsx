@@ -4,7 +4,7 @@ import { Search as SearchIcon, Filter, X } from 'lucide-react'
 import { usePokemonStore } from '../store/pokemonStore'
 import PokemonCard from '../components/PokemonCard'
 import { useQuery } from 'react-query'
-import { pokemonAPI } from '../services/api'
+import { pokemonAPI, testAPI } from '../services/api'
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,6 +17,22 @@ const Search = () => {
   
   React.useEffect(() => {
     setIsMounted(true)
+    
+    // Test API connection on mount
+    const testConnection = async () => {
+      try {
+        const result = await testAPI.testConnection()
+        if (result.success) {
+          console.log('✅ Pokemon API is working:', result.pokemon.name)
+        } else {
+          console.error('❌ Pokemon API test failed:', result.error)
+        }
+      } catch (error) {
+        console.error('❌ API test error:', error)
+      }
+    }
+    
+    testConnection()
   }, [])
 
   // Fetch Pokemon types for filter
