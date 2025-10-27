@@ -59,22 +59,25 @@ export const pokemonAPI = {
   // Get Pokemon by ID or name
   getPokemon: async (identifier) => {
     try {
-      // Convert Korean name to English if needed
+      // Try direct identifier first (for IDs)
+      if (!isNaN(identifier)) {
+        const response = await pokeAPI.get(`/pokemon/${identifier}`)
+        return response.data
+      }
+      
+      // Try Korean name conversion
       const englishName = convertKoreanToEnglish(identifier)
       const response = await pokeAPI.get(`/pokemon/${englishName}`)
       
-      // Add Korean name to response
-      const pokemonData = response.data
-      const koreanName = Object.keys(KOREAN_TO_ENGLISH).find(
-        key => KOREAN_TO_ENGLISH[key] === pokemonData.name
-      )
-      
-      return {
-        ...pokemonData,
-        korean_name: koreanName || pokemonData.name
-      }
+      return response.data
     } catch (error) {
-      throw new Error(`포켓몬 "${identifier}"을 찾을 수 없습니다.`)
+      // If Korean conversion fails, try original identifier
+      try {
+        const response = await pokeAPI.get(`/pokemon/${identifier}`)
+        return response.data
+      } catch (secondError) {
+        throw new Error(`포켓몬 "${identifier}"을 찾을 수 없습니다.`)
+      }
     }
   },
 
@@ -102,11 +105,10 @@ export const pokemonAPI = {
   // Search Pokemon (simplified - just get Pokemon by name)
   searchPokemon: async (query) => {
     try {
-      const englishName = convertKoreanToEnglish(query)
-      const response = await pokeAPI.get(`/pokemon/${englishName}`)
-      
+      // Try to get Pokemon directly
+      const pokemon = await pokemonAPI.getPokemon(query)
       return {
-        results: [response.data],
+        results: [pokemon],
         count: 1
       }
     } catch (error) {
@@ -118,13 +120,11 @@ export const pokemonAPI = {
   // Get Pokemon stats (same as getPokemon)
   getPokemonStats: async (identifier) => {
     try {
-      const englishName = convertKoreanToEnglish(identifier)
-      const response = await pokeAPI.get(`/pokemon/${englishName}`)
-      
+      const pokemon = await pokemonAPI.getPokemon(identifier)
       return {
-        stats: response.data.stats,
-        name: response.data.name,
-        id: response.data.id
+        stats: pokemon.stats,
+        name: pokemon.name,
+        id: pokemon.id
       }
     } catch (error) {
       throw new Error(`포켓몬 "${identifier}"의 능력치를 가져오는데 실패했습니다.`)
