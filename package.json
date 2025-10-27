@@ -17,7 +17,6 @@
     "full:dev": "concurrently \"npm run web-server\" \"npm run web:dev\"",
     "build": "npm run web:build",
     "preview": "npm run web:preview",
-    "generate-icons": "node scripts/create-simple-icons.js && node scripts/convert-svg-to-png.js",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
@@ -49,8 +48,6 @@
     "sharp": "^0.34.4",
     "tailwindcss": "^3.3.6",
     "vite": "^5.0.0",
-    "vite-plugin-pwa": "^1.1.0",
-    "workbox-window": "^7.3.0"
   },
   "keywords": [
     "pokemon",

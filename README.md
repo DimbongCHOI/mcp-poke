@@ -1,11 +1,9 @@
 **일반 기능: Cursor 채팅으로 실행 !!**
-**PWA (Progressive Web App) - 모바일 앱처럼 사용 가능! 📱**
 **React 기반 웹 앱 개발 중 !! -> npm run full:dev**
 
-# 🎮 포켓몬 AI 챗봇 & PWA 📱
+# 🎮 포켓몬 AI 챗봇
 
-포켓몬 API를 활용한 MCP(Model Context Protocol) 서버와 자연어 처리 챗봇입니다.  
-**Progressive Web App으로 모바일 앱처럼 사용 가능!** 🚀
+포켓몬 API를 활용한 MCP(Model Context Protocol) 서버와 자연어 처리 챗봇입니다.
 
 ## ✨ 주요 기능
 
@@ -15,7 +13,6 @@
 - 🎯 **타입 상성 조회**: "불꽃은 풀에게 효과적인가?" 같은 질문
 - 📊 **능력치 분석**: 포켓몬의 스탯 정보와 차트
 - 🗣️ **자연어 대화**: 한국어로 자연스럽게 대화
-- 📱 **PWA 지원**: 모바일/데스크톱에 앱으로 설치 가능
 
 ---
 
@@ -82,13 +79,6 @@ npm install
 
 ### 🎮 **3단계: 실행 방법 선택**
 
-#### 🌐 **웹 앱 + API 서버 실행 (PWA)**
-```bash
-npm run full:dev
-```
-- 🖥️ **웹 UI**: http://localhost:3000
-- 📡 **API 서버**: http://localhost:3001
-- 📱 **모바일 접속**: http://[내-IP주소]:3000
 
 #### 💬 **콘솔 챗봇 실행**
 ```bash
@@ -98,64 +88,6 @@ npm start
 
 ---
 
-## 📱 **PWA 모바일 설치 가이드**
-
-### 🔧 **PC에서 준비하기**
-
-#### 1️⃣ **IP 주소 확인**
-**Windows:**
-```bash
-ipconfig
-```
-**Mac/Linux:**
-```bash
-ifconfig
-```
-`IPv4 주소` 찾기 (예: `192.168.0.123`)
-
-#### 2️⃣ **방화벽 열기 (Windows)**
-**관리자 권한**으로 PowerShell 실행:
-```powershell
-New-NetFirewallRule -DisplayName "Vite Dev Server" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
-New-NetFirewallRule -DisplayName "Node API Server" -Direction Inbound -Protocol TCP -LocalPort 3001 -Action Allow
-```
-
-#### 3️⃣ **서버 실행**
-```bash
-npm run full:dev
-```
-
-### 📲 **모바일에서 접속하기**
-
-#### ✅ **같은 Wi-Fi 연결 필수**
-- PC와 핸드폰이 **같은 Wi-Fi**에 연결되어야 합니다
-- 학교/회사 Wi-Fi는 차단될 수 있음 → **핸드폰 테더링** 추천
-
-#### 🌐 **브라우저에서 접속**
-```
-http://[PC의-IP주소]:3000
-```
-예: `http://192.168.0.123:3000`
-
-#### 📱 **PWA 앱으로 설치**
-
-**🍎 아이폰 (Safari):**
-1. 하단 **공유 버튼** (↑) 터치
-2. **"홈 화면에 추가"** 선택
-3. **"추가"** 터치
-4. ✅ 홈 화면에 앱 아이콘 생성!
-
-**🤖 안드로이드 (Chrome):**
-1. 자동으로 **"앱 설치"** 배너 표시
-2. **"설치"** 터치
-3. ✅ 홈 화면에 앱 아이콘 생성!
-
-**💻 PC (Chrome/Edge):**
-1. 주소창 오른쪽 **설치 아이콘** (⊕) 클릭
-2. **"설치"** 클릭
-3. ✅ 독립 창으로 실행!
-
-📖 **PWA 기능:** 모바일/데스크톱에 앱으로 설치 가능
 
 ---
 
